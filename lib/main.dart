@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'orgainic milk',
+      title: 'Tic Tac Toe',
       theme: ThemeData(
           fontFamily: 'Poppins',
           textTheme: TextTheme(

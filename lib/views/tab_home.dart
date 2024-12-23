@@ -22,13 +22,26 @@ class _TabHomeState extends State<TabHome> {
     double height = MediaQuery.sizeOf(context).height;
 
     return Scaffold(
-      backgroundColor: Colors.teal,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width * 0.02),
-        child: Column(
-          children: [
-            Expanded(
-                child: Row(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/bg.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 2, 38, 68).withOpacity(0.9)),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: width * 0.02),
+            child: Column(
+              children: [
+                Expanded(
+                    child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
@@ -41,7 +54,13 @@ class _TabHomeState extends State<TabHome> {
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineLarge
-                                ?.copyWith(color: Colors.white),
+                                ?.copyWith(color: Colors.white, shadows: [
+                              for (double i = 1; i < 5; i++)
+                                Shadow(
+                                  color: Colors.yellow,
+                                  blurRadius: 2 * i,
+                                )
+                            ]),
                           ),
                           SizedBox(
                             height: height * 0.02,
@@ -57,7 +76,7 @@ class _TabHomeState extends State<TabHome> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.all(width*0.04),
+                      padding: EdgeInsets.all(width * 0.04),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -66,7 +85,13 @@ class _TabHomeState extends State<TabHome> {
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineLarge
-                                ?.copyWith(color: Colors.white),
+                                ?.copyWith(color: Colors.white, shadows: [
+                              for (double i = 1; i < 5; i++)
+                                Shadow(
+                                  color: Colors.red,
+                                  blurRadius: 2 * i,
+                                )
+                            ]),
                           ),
                           SizedBox(
                             height: height * 0.02,
@@ -83,36 +108,52 @@ class _TabHomeState extends State<TabHome> {
                     )
                   ],
                 )),
-            Expanded(
-              flex: 3,
-              child: GridView.builder(
-                itemCount: 9,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                ),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      _taped(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white)),
-                      child: Center(
-                        child: Text(
-                          displayExOh[index],
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.white, fontSize: 40),
-                          
-                        ),
-                      ),
+                Expanded(
+                  flex: 3,
+                  child: GridView.builder(
+                    itemCount: 9,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
                     ),
-                  );
-                },
-              ),
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          _taped(index);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white)),
+                          child: Center(
+                            child: Text(
+                              displayExOh[index],
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineLarge
+                                  ?.copyWith(
+                                      color: Colors.white,
+                                      fontSize: 40,
+                                      shadows: [
+                                    for (double i = 1; i < 5; i++)
+                                      Shadow(
+                                        color: displayExOh[index] == "x"
+                                            ? Colors.red
+                                            : Colors.green,
+                                        blurRadius: 2 * i,
+                                      )
+                                  ]),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Expanded(child: Container()),
+              ],
             ),
-            Expanded(child: Container()),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -191,15 +232,43 @@ class _TabHomeState extends State<TabHome> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("The Winner is $winner", style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.teal)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _clearBoard();
-                Navigator.of(context).pop();
-              },
-              child: Text("Play Again", style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.teal),),
-            )
+        backgroundColor: Colors.blue[700],
+        shadowColor: Colors.yellow,
+          title: Center(
+            child: Text("The Winner is ${winner.toUpperCase()}",
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(
+                      fontSize: 16,
+                    color: Colors.yellow,
+                    shadows: [
+                      for (double i = 1; i < 4; i++)
+                        Shadow(
+                          color: Colors.red,
+                          blurRadius: 3 * i,
+                        ),
+                    ],
+                    )),
+          ),
+          actions:
+           
+           [
+          const SizedBox(height: 10,),
+
+
+              Center(
+                child: CustomButton(
+                    width: 120,
+                    height: 40,
+                    title: "Play Again",
+                    onPressed: (){
+                       _clearBoard();
+                  Navigator.of(context).pop();
+                    },
+                  ),
+              ),
+                
           ],
         );
       },
@@ -217,15 +286,26 @@ class _TabHomeState extends State<TabHome> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("DRAW", style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.teal)),
+           backgroundColor: Colors.blue[700],
+        shadowColor: Colors.yellow,
+          title: Text("DRAW",
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(fontSize: 16,
+                  color: Colors.white,
+                  shadows: [
+                    for (double i = 1; i < 4; i++)
+                      Shadow(
+                        color: Colors.green,
+                        blurRadius: 3 * i,
+                      ),
+                  ],)),
           actions: [
-            TextButton(
-              onPressed: () {
-                _clearBoard();
+           CustomButton(title: "Play Again", width: 120, height: 40, onPressed: (){
+              _clearBoard();
                 Navigator.of(context).pop();
-              },
-              child: Text("Play Again", style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.teal)),
-            )
+           })
           ],
         );
       },

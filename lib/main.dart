@@ -1,5 +1,5 @@
 
-import 'package:tic_tac_toe/views/home.dart';
+import 'package:tic_tac_toe/views/welcome.dart';
 
 import 'exports.dart';
 
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-      home: const  HomePage(),
+      home: const  WelcomePage(),
     );
   }
 }

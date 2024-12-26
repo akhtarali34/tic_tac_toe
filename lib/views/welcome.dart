@@ -84,13 +84,24 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
                 SizedBox(height: height*0.05,),
                 CustomButton(
-                  width: 150,
+                  width: 200,
                   height: 50,
-                  title: "PLAY GAME",
+                  title: "Play With Human",
                   onPressed: (){
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
                   },
-                )
+                ),
+                const SizedBox(height:20),
+                CustomButton(
+                  width: 200,
+                  height: 50,
+                  title: "Play With Computer",
+                  shadowColor: Colors.yellow,
+                  onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>const HomePage()));
+                  },
+                ),
+                
               ],
             ),
           )

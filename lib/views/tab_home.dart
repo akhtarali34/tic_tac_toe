@@ -1,6 +1,4 @@
-
 part of "home.dart";
-
 
 class TabHome extends StatefulWidget {
   const TabHome({super.key});
@@ -13,13 +11,25 @@ class _TabHomeState extends State<TabHome> {
   int exScore = 0;
   int ohScore = 0;
   int filledBoxes = 0;
+  int gamelevel = 3;
 
   bool ohTurn = true;
-  List<String> displayExOh = ["", "", "", "", "", "", "", "", ""];
+  late List<String> displayExOh;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeBoard();
+  }
+
+  void _initializeBoard() {
+    displayExOh = List<String>.filled(gamelevel * gamelevel, "");
+    filledBoxes = 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
-    double height = MediaQuery.sizeOf(context).height;
 
     return Scaffold(
       body: Stack(
@@ -41,80 +51,22 @@ class _TabHomeState extends State<TabHome> {
             child: Column(
               children: [
                 Expanded(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(width * 0.03),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Player X",
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineLarge
-                                ?.copyWith(color: Colors.white, shadows: [
-                              for (double i = 1; i < 5; i++)
-                                Shadow(
-                                  color: Colors.yellow,
-                                  blurRadius: 2 * i,
-                                )
-                            ]),
-                          ),
-                          SizedBox(
-                            height: height * 0.02,
-                          ),
-                          Text(
-                            exScore.toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(width * 0.04),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Player O",
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineLarge
-                                ?.copyWith(color: Colors.white, shadows: [
-                              for (double i = 1; i < 5; i++)
-                                Shadow(
-                                  color: Colors.red,
-                                  blurRadius: 2 * i,
-                                )
-                            ]),
-                          ),
-                          SizedBox(
-                            height: height * 0.02,
-                          ),
-                          Text(
-                            ohScore.toString(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                )),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildScoreBoard(
+                          context, "Player X", exScore, Colors.yellow),
+                      _buildScoreBoard(
+                          context, "Player O", ohScore, Colors.red),
+                    ],
+                  ),
+                ),
                 Expanded(
                   flex: 3,
                   child: GridView.builder(
-                    itemCount: 9,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
+                    itemCount: gamelevel * gamelevel,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gamelevel,
                     ),
                     itemBuilder: (context, index) {
                       return InkWell(
@@ -131,17 +83,18 @@ class _TabHomeState extends State<TabHome> {
                                   .textTheme
                                   .headlineLarge
                                   ?.copyWith(
-                                      color: Colors.white,
-                                      fontSize: 40,
-                                      shadows: [
-                                    for (double i = 1; i < 5; i++)
-                                      Shadow(
-                                        color: displayExOh[index] == "x"
-                                            ? Colors.red
-                                            : Colors.green,
-                                        blurRadius: 2 * i,
-                                      )
-                                  ]),
+                                color: Colors.white,
+                                fontSize: 40,
+                                shadows: [
+                                  for (double i = 1; i < 5; i++)
+                                    Shadow(
+                                      color: displayExOh[index] == "x"
+                                          ? Colors.red
+                                          : Colors.green,
+                                      blurRadius: 2 * i,
+                                    )
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -149,7 +102,45 @@ class _TabHomeState extends State<TabHome> {
                     },
                   ),
                 ),
-                Expanded(child: Container()),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      CustomButton(
+                          title: "Easy",
+                          width: 80,
+                          height: 40,
+                          shadowColor: Colors.green,
+                          onPressed: () {
+                            setState(() {
+                              gamelevel = 3;
+                              _initializeBoard();
+                            });
+                          }),
+                      CustomButton(
+                          title: "Medium",
+                          width: 90,
+                          height: 40,
+                          shadowColor: Colors.yellow,
+                          onPressed: () {
+                            setState(() {
+                              gamelevel = 5;
+                              _initializeBoard();
+                            });
+                          }),
+                      CustomButton(
+                          title: "Hard",
+                          width: 80,
+                          height: 40,
+                          onPressed: () {
+                            setState(() {
+                              gamelevel = 7;
+                              _initializeBoard();
+                            });
+                          }),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -158,166 +149,176 @@ class _TabHomeState extends State<TabHome> {
     );
   }
 
-  _taped(int index) {
-    setState(() {
-      if (ohTurn && displayExOh[index] == "") {
-        displayExOh[index] = "o";
-        filledBoxes += 1;
-      } else if (!ohTurn && displayExOh[index] == "") {
-        displayExOh[index] = "x";
-        filledBoxes += 1;
-      }
+  Widget _buildScoreBoard(
+      BuildContext context, String player, int score, Color shadowColor) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            player,
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+              color: Colors.white,
+              shadows: [
+                for (double i = 1; i < 5; i++)
+                  Shadow(
+                    color: shadowColor,
+                    blurRadius: 2 * i,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            score.toString(),
+            style: Theme.of(context)
+                .textTheme
+                .headlineMedium
+                ?.copyWith(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
 
-      ohTurn = !ohTurn;
-      _checkWiner();
-    });
+  void _taped(int index) {
+    if (displayExOh[index] == "") {
+      setState(() {
+        displayExOh[index] = ohTurn ? "o" : "x";
+        filledBoxes++;
+        ohTurn = !ohTurn;
+        _checkWiner();
+      });
+    }
   }
 
   void _checkWiner() {
-    //check first row
-    if (displayExOh[0] == displayExOh[1] &&
-        displayExOh[0] == displayExOh[2] &&
-        displayExOh[0] != "") {
-      _showDialogue(displayExOh[0]);
+    List<List<int>> winPatterns = _generateWinPatterns();
+
+    // Check for a winner in all patterns
+    for (var pattern in winPatterns) {
+      if (pattern.every((index) => displayExOh[index] == "x")) {
+        _showDialogue("x");
+        return;
+      } else if (pattern.every((index) => displayExOh[index] == "o")) {
+        _showDialogue("o");
+        return;
+      }
     }
-    //check second row
-    if (displayExOh[3] == displayExOh[4] &&
-        displayExOh[3] == displayExOh[5] &&
-        displayExOh[3] != "") {
-      _showDialogue(displayExOh[3]);
-    }
-    //check Third row
-    if (displayExOh[6] == displayExOh[7] &&
-        displayExOh[6] == displayExOh[8] &&
-        displayExOh[6] != "") {
-      _showDialogue(displayExOh[6]);
-    }
-    //check first Column
-    if (displayExOh[0] == displayExOh[3] &&
-        displayExOh[0] == displayExOh[6] &&
-        displayExOh[0] != "") {
-      _showDialogue(displayExOh[0]);
-    }
-    //check second Column
-    if (displayExOh[1] == displayExOh[4] &&
-        displayExOh[1] == displayExOh[7] &&
-        displayExOh[1] != "") {
-      _showDialogue(displayExOh[1]);
-    }
-    //check third Column
-    if (displayExOh[2] == displayExOh[5] &&
-        displayExOh[2] == displayExOh[8] &&
-        displayExOh[2] != "") {
-      _showDialogue(displayExOh[2]);
-    }
-    //check first diagonal
-    if (displayExOh[0] == displayExOh[4] &&
-        displayExOh[0] == displayExOh[8] &&
-        displayExOh[0] != "") {
-      _showDialogue(displayExOh[0]);
-    }
-    //check second diagonal
-    if (displayExOh[2] == displayExOh[4] &&
-        displayExOh[2] == displayExOh[6] &&
-        displayExOh[2] != "") {
-      _showDialogue(displayExOh[2]);
-    } else if (filledBoxes == 9) {
+
+    // If all boxes are filled and no winner
+    if (filledBoxes == gamelevel * gamelevel) {
       _showDrawDialogue();
     }
   }
 
+  List<List<int>> _generateWinPatterns() {
+    List<List<int>> patterns = [];
+
+    // Rows
+    for (int i = 0; i < gamelevel; i++) {
+      patterns.add(List.generate(gamelevel, (j) => i * gamelevel + j));
+    }
+
+    // Columns
+    for (int i = 0; i < gamelevel; i++) {
+      patterns.add(List.generate(gamelevel, (j) => j * gamelevel + i));
+    }
+
+    // Diagonal 1
+    patterns.add(List.generate(gamelevel, (i) => i * (gamelevel + 1)));
+
+    // Diagonal 2
+    patterns.add(List.generate(gamelevel, (i) => (i + 1) * (gamelevel - 1)));
+
+    return patterns;
+  }
+
   void _showDialogue(String winner) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-        backgroundColor: Colors.blue[700],
-        shadowColor: Colors.yellow,
-          title: Center(
-            child: Text("The Winner is ${winner.toUpperCase()}",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(
-                      fontSize: 16,
-                    color: Colors.yellow,
-                    shadows: [
-                      for (double i = 1; i < 4; i++)
-                        Shadow(
-                          color: Colors.red,
-                          blurRadius: 3 * i,
-                        ),
-                    ],
-                    )),
-          ),
-          actions:
-           
-           [
-          const SizedBox(height: 10,),
-
-
-              Center(
-                child: CustomButton(
-                    width: 120,
-                    height: 40,
-                    title: "Play Again",
-                    onPressed: (){
-                       _clearBoard();
-                  Navigator.of(context).pop();
-                    },
-                  ),
-              ),
-                
-          ],
-        );
-      },
-    );
     if (winner == 'o') {
       ohScore += 1;
     } else if (winner == 'x') {
       exScore += 1;
     }
-  }
 
-  _showDrawDialogue() {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
         return AlertDialog(
-           backgroundColor: Colors.blue[700],
-        shadowColor: Colors.yellow,
-          title: Text("DRAW",
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(fontSize: 16,
-                  color: Colors.white,
+          backgroundColor: Colors.blue[700],
+          shadowColor: Colors.yellow,
+          title: Center(
+            child: Text("The Winner is ${winner.toUpperCase()}",
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontSize: 16,
+                  color: Colors.yellow,
                   shadows: [
                     for (double i = 1; i < 4; i++)
                       Shadow(
-                        color: Colors.green,
+                        color: Colors.red,
                         blurRadius: 3 * i,
                       ),
-                  ],)),
+                  ],
+                )),
+          ),
           actions: [
-           CustomButton(title: "Play Again", width: 120, height: 40, onPressed: (){
-              _clearBoard();
-                Navigator.of(context).pop();
-           })
+            Center(
+              child: CustomButton(
+                width: 120,
+                height: 40,
+                title: "Play Again",
+                onPressed: () {
+                  _clearBoard();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
           ],
         );
       },
     );
   }
 
-  _clearBoard() {
+  void _showDrawDialogue() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.blue[700],
+          shadowColor: Colors.yellow,
+          title: Text("DRAW",
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontSize: 16,
+                color: Colors.white,
+                shadows: [
+                  for (double i = 1; i < 4; i++)
+                    Shadow(
+                      color: Colors.green,
+                      blurRadius: 3 * i,
+                    ),
+                ],
+              )),
+          actions: [
+            CustomButton(
+                title: "Play Again",
+                width: 120,
+                height: 40,
+                onPressed: () {
+                  _clearBoard();
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+    );
+  }
+
+  void _clearBoard() {
     setState(() {
-      for (int i = 0; i < 9; i++) {
-        displayExOh[i] = "";
-      }
-      filledBoxes = 0;
+      _initializeBoard();
     });
   }
 }

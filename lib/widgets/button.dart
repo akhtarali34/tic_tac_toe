@@ -6,13 +6,16 @@ class CustomButton extends StatefulWidget {
   final double height; // Button height
   final VoidCallback onPressed; // Button onPress callback
   final IconData? icon; // Optional icon
+   final Color shadowColor;
 
   const CustomButton({
     super.key,
     required this.title,
     required this.width,
     required this.height,
+    
     required this.onPressed,
+    this.shadowColor= Colors.red,
     this.icon, // Optional icon
   });
 
@@ -41,7 +44,7 @@ class _CustomButtonState extends State<CustomButton> {
             for (double i = 1; i < 5; i++)
               BoxShadow(
                 spreadRadius: -1,
-                color: Colors.red,
+                color: widget.shadowColor,
                 blurRadius: (isPressed ? 3 : 2) * i,
                 blurStyle: BlurStyle.outer,
               ),
@@ -75,7 +78,7 @@ class _CustomButtonState extends State<CustomButton> {
                   shadows: [
                     for (double i = 1; i < (isPressed ? 8 : 4); i++)
                       Shadow(
-                        color: Colors.red,
+                        color: widget.shadowColor,
                         blurRadius: 3 * i,
                       ),
                   ],
